@@ -31,6 +31,7 @@ This FastAPI application serves as an intermediary between client requests and N
 ## API Routes
 
 - **/api/generate**: POST endpoint that accepts a prompt and parameters to generate an image using Nebius Studio's API and logs the process in Supabase.
+- **/api/logs**: GET endpoint that retrieves generation logs from Supabase with filtering and pagination options.
 
 ### API Request Format
 
@@ -63,6 +64,49 @@ This FastAPI application serves as an intermediary between client requests and N
     { "step": "calling_nebius_api", "timestamp": "2023-05-01T12:34:56.100Z" },
     { "step": "image_generated", "timestamp": "2023-05-01T12:34:58.500Z" }
   ]
+}
+```
+
+### Logs API Request Format
+
+```
+GET /api/logs?limit=50&offset=0&requestId=123&status=completed&userId=anonymous
+```
+
+Query parameters:
+
+- `limit`: Maximum number of logs to return (default: 50)
+- `offset`: Number of logs to skip (default: 0)
+- `requestId`: Filter logs by request ID (optional)
+- `status`: Filter logs by status (optional)
+- `userId`: Filter logs by user ID (optional)
+
+### Logs API Response Format
+
+```json
+{
+  "logs": [
+    {
+      "id": "1",
+      "request_id": "123e4567-e89b-12d3-a456-426614174000",
+      "user_id": "anonymous",
+      "prompt": "A beautiful sunset over mountains",
+      "status": "completed",
+      "step": "image_generated",
+      "details": { "imageSize": "original" },
+      "image_url": "/generated/123e4567-e89b-12d3-a456-426614174000.webp",
+      "created_at": "2023-05-01T12:34:58.500Z"
+    }
+    // More logs...
+  ],
+  "groupedLogs": {
+    "123e4567-e89b-12d3-a456-426614174000": [
+      // All logs for this request ID
+    ]
+  },
+  "count": 100,
+  "limit": 50,
+  "offset": 0
 }
 ```
 
@@ -100,14 +144,18 @@ All requests, responses, and errors are logged and stored in Supabase for monito
 src/
 ├── app/
 │   ├── api/
-│   │   └── generate/
-│   │       └── route.ts      # API endpoint for image generation
+│   │   ├── generate/
+│   │   │   └── route.ts      # API endpoint for image generation
+│   │   └── logs/
+│   │       └── route.ts      # API endpoint for fetching logs
 │   ├── components/
 │   │   ├── GeneratedImage.tsx  # Component for displaying generated images
 │   │   ├── LoadingSpinner.tsx  # Loading indicator component
 │   │   └── Navigation.tsx      # Navigation component
 │   ├── generate/
 │   │   └── page.tsx          # Image generation page
+│   ├── logs/
+│   │   └── page.tsx          # Logs visualization page
 │   ├── globals.css           # Global styles
 │   ├── layout.tsx            # Root layout component
 │   └── page.tsx              # Home page
@@ -152,3 +200,57 @@ const response = await client.images.generate({
   },
 });
 ```
+
+## Supabase Setup
+
+This application uses Supabase for storing generation logs. You need to set up a Supabase database with the appropriate table structure:
+
+1. **Create a Supabase Project**:
+
+   - Go to [Supabase](https://supabase.com/) and sign up or log in
+   - Create a new project
+   - Note your project URL and service role key (you'll need these for the `.env.local` file)
+
+2. **Create the Generation Logs Table**:
+   - In your Supabase dashboard, navigate to the SQL Editor
+   - Create a new query and paste the following SQL:
+
+```sql
+-- Create the generation_logs table
+CREATE TABLE public.generation_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  request_id UUID NOT NULL,
+  user_id TEXT NOT NULL,
+  prompt TEXT NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('started', 'processing', 'completed', 'failed')),
+  step TEXT NOT NULL,
+  details JSONB,
+  image_url TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Create indexes for better query performance
+CREATE INDEX idx_generation_logs_request_id ON public.generation_logs(request_id);
+CREATE INDEX idx_generation_logs_user_id ON public.generation_logs(user_id);
+CREATE INDEX idx_generation_logs_status ON public.generation_logs(status);
+CREATE INDEX idx_generation_logs_created_at ON public.generation_logs(created_at);
+
+-- Set up Row Level Security (RLS)
+ALTER TABLE public.generation_logs ENABLE ROW LEVEL SECURITY;
+
+-- Create a policy that allows all operations for authenticated users
+CREATE POLICY "Allow all operations for authenticated users"
+  ON public.generation_logs
+  FOR ALL
+  TO authenticated
+  USING (true);
+
+-- Create a policy that allows read-only access for anonymous users
+CREATE POLICY "Allow read-only access for anonymous users"
+  ON public.generation_logs
+  FOR SELECT
+  TO anon
+  USING (true);
+```
+
+3. **Run the query** to create the table and set up the necessary indexes and security policies

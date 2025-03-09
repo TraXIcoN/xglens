@@ -37,6 +37,16 @@ export default function Navigation() {
           >
             Generate
           </Link>
+          <Link
+            href="/logs"
+            className={`px-3 py-2 rounded-md ${
+              isActive("/logs")
+                ? "bg-blue-600 text-white"
+                : "hover:bg-gray-200 dark:hover:bg-gray-700"
+            }`}
+          >
+            Logs
+          </Link>
         </div>
       </div>
     </nav>

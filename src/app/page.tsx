@@ -57,6 +57,23 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        <div className="mt-8 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+          <h2 className="text-xl font-semibold mb-4">Comprehensive Logging</h2>
+          <p className="mb-4">
+            Every step of the image generation process is logged for
+            transparency and debugging. View detailed logs to understand how
+            your images are created.
+          </p>
+          <div className="flex justify-center mt-4">
+            <Link
+              href="/logs"
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+            >
+              View Logs
+            </Link>
+          </div>
+        </div>
       </div>
 
       <footer className="mt-16 text-center text-sm text-gray-500">
