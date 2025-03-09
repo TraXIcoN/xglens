@@ -4,6 +4,7 @@ import { useState } from "react";
 import GeneratedImage from "../components/GeneratedImage";
 import Navigation from "../components/Navigation";
 import LoadingSpinner from "../components/LoadingSpinner";
+import Link from "next/link";
 
 interface GenerationResponse {
   success: boolean;
@@ -35,6 +36,7 @@ export default function GeneratePage() {
     Array<{ step: string; timestamp: string }>
   >([]);
   const [error, setError] = useState("");
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   const styles = [
     { id: "realistic", name: "Realistic" },
@@ -50,6 +52,9 @@ export default function GeneratePage() {
     setIsGenerating(true);
     setError("");
     setGenerationLogs([]);
+    setGeneratedImage("");
+    setRequestId("");
+    setSaveSuccess(false);
 
     try {
       const response = await fetch("/api/generate", {
@@ -98,8 +103,8 @@ export default function GeneratePage() {
   };
 
   const handleSave = () => {
-    // In a real app, this would save the image to a gallery
-    alert("Save to gallery functionality would be implemented here");
+    setSaveSuccess(true);
+    // Optionally, you could refresh the gallery here or show a notification
   };
 
   return (
@@ -233,9 +238,23 @@ export default function GeneratePage() {
           <>
             <GeneratedImage
               imageUrl={generatedImage}
+              requestId={requestId}
               onDownload={handleDownload}
               onSave={handleSave}
             />
+
+            {saveSuccess && (
+              <div className="mt-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
+                <p className="font-bold">Image saved to gallery!</p>
+                <p>
+                  You can view it on the{" "}
+                  <Link href="/" className="underline">
+                    home page
+                  </Link>
+                  .
+                </p>
+              </div>
+            )}
 
             {generationLogs.length > 0 && (
               <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mt-8">

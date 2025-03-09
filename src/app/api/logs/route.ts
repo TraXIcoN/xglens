@@ -14,6 +14,7 @@ export async function GET(request: NextRequest) {
     const requestId = searchParams.get("requestId");
     const status = searchParams.get("status");
     const userId = searchParams.get("userId");
+    const galleryOnly = searchParams.get("galleryOnly") === "true";
 
     // Check if the generation_logs table exists
     const { error: tableCheckError } = await supabase
@@ -53,6 +54,13 @@ export async function GET(request: NextRequest) {
     }
     if (userId) {
       query = query.eq("user_id", userId);
+    }
+
+    // Filter for gallery images (those with image_url and saved_to_gallery flag)
+    if (galleryOnly) {
+      query = query
+        .not("image_url", "is", null)
+        .contains("details", { saved_to_gallery: true });
     }
 
     // Apply pagination

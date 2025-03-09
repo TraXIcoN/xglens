@@ -1,13 +1,16 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import Navigation from "./components/Navigation";
+import ImageGallery from "./components/ImageGallery";
 
 export default function Home() {
   return (
     <div className="min-h-screen p-8">
       <Navigation />
 
-      <div className="max-w-4xl mx-auto flex flex-col items-center justify-center py-12">
+      <div className="max-w-6xl mx-auto flex flex-col items-center justify-center py-12">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4">Welcome to XGenLens</h1>
           <p className="text-xl mb-8">
@@ -58,7 +61,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="mt-8 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+        <div className="mt-8 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md w-full">
           <h2 className="text-xl font-semibold mb-4">Comprehensive Logging</h2>
           <p className="mb-4">
             Every step of the image generation process is logged for
@@ -73,6 +76,11 @@ export default function Home() {
               View Logs
             </Link>
           </div>
+        </div>
+
+        {/* Gallery Section */}
+        <div className="mt-12 w-full">
+          <ImageGallery />
         </div>
       </div>
 
