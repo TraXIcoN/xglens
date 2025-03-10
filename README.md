@@ -4,7 +4,13 @@ This FastAPI application serves as an intermediary between client requests and N
 
 ## Features
 
-- Text-to-image generation via Nebius Studio
+- **Text-to-Image Generation**: Create images from text descriptions
+- **Customizable Parameters**: Adjust diffusion strength, style intensity, and select from various styles
+- **Prompt Enhancement**: AI-powered prompt improvement for better image generation results
+- **Modern UI**: Clean, responsive interface built with Next.js and Tailwind CSS
+- **Dark Mode Support**: Automatically adapts to user's system preferences
+- **Image Gallery**: Save and view generated images in a staggered grid layout
+- **Generation Logs**: View detailed logs of the image generation process
 - Detailed request and response logging
 - Storage of logs in Supabase
 - Error handling and reporting
@@ -146,26 +152,37 @@ src/
 │   ├── api/
 │   │   ├── generate/
 │   │   │   └── route.ts      # API endpoint for image generation
+│   │   ├── enhance-prompt/
+│   │   │   └── route.ts      # API endpoint for prompt enhancement
 │   │   └── logs/
 │   │       └── route.ts      # API endpoint for fetching logs
 │   ├── components/
 │   │   ├── GeneratedImage.tsx  # Component for displaying generated images
 │   │   ├── LoadingSpinner.tsx  # Loading indicator component
-│   │   └── Navigation.tsx      # Navigation component
+│   │   ├── Navigation.tsx      # Navigation component
+│   │   ├── PromptEnhancer.tsx  # Component for enhancing prompts
+│   │   └── StreamingLogs.tsx   # Component for streaming logs visualization
 │   ├── generate/
 │   │   └── page.tsx          # Image generation page
 │   ├── logs/
+│   │   ├── [requestId]/
+│   │   │   └── page.tsx      # Detailed log view with streaming animation
 │   │   └── page.tsx          # Logs visualization page
 │   ├── globals.css           # Global styles
 │   ├── layout.tsx            # Root layout component
 │   └── page.tsx              # Home page
 ├── utils/
 │   ├── env.ts                # Environment variable validation
-│   ├── nebius-api.ts         # Nebius Studio API client
+│   ├── nebius-api.ts         # Nebius Studio API client for image generation
+│   ├── prompt-enhancer.ts    # Utility for enhancing prompts using LLMs
 │   └── supabase.ts           # Supabase client and logging utilities
 ```
 
 ## API Implementation
+
+The application includes several API endpoints:
+
+### Image Generation API
 
 The image generation API uses the OpenAI client library to interact with Nebius Studio's API. The implementation:
 
@@ -176,7 +193,17 @@ The image generation API uses the OpenAI client library to interact with Nebius 
 5. Saves base64 images to the filesystem if needed
 6. Returns the image URL and metadata to the client
 
-### OpenAI Client Usage
+### Prompt Enhancement API
+
+The prompt enhancement API uses the Nebius Studio's LLM capabilities to improve user prompts:
+
+1. Takes the user's original prompt and negative prompt
+2. Sends them to a language model (Meta-Llama-3.1-8B-Instruct) with specific instructions
+3. The model enhances the prompt with more descriptive details, better structure, and improved negative prompts
+4. Returns the enhanced prompts with an explanation of the improvements
+5. Users can review and apply the enhanced prompts for better image generation results
+
+### OpenAI Client Usage for Image Generation
 
 ```typescript
 import OpenAI from "openai";
@@ -198,6 +225,38 @@ const response = await client.images.generate({
     seed: -1,
     negative_prompt: "Giraffes, night sky",
   },
+});
+```
+
+### OpenAI Client Usage for Prompt Enhancement
+
+```typescript
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  baseURL: "https://api.studio.nebius.com/v1/",
+  apiKey: process.env.NEBIUS_API_KEY,
+});
+
+const response = await client.chat.completions.create({
+  max_tokens: 500,
+  temperature: 0.7,
+  model: "meta-llama/Meta-Llama-3.1-8B-Instruct",
+  response_format: {
+    type: "json_object",
+  },
+  messages: [
+    {
+      role: "system",
+      content:
+        "You are an expert at crafting optimal prompts for text-to-image AI models...",
+    },
+    {
+      role: "user",
+      content:
+        "Please enhance this image generation prompt: 'A cat sitting on a windowsill'",
+    },
+  ],
 });
 ```
 

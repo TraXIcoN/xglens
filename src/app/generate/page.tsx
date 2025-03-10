@@ -4,6 +4,7 @@ import { useState } from "react";
 import GeneratedImage from "../components/GeneratedImage";
 import Navigation from "../components/Navigation";
 import LoadingSpinner from "../components/LoadingSpinner";
+import PromptEnhancer from "../components/PromptEnhancer";
 import Link from "next/link";
 
 interface GenerationResponse {
@@ -37,6 +38,7 @@ export default function GeneratePage() {
   >([]);
   const [error, setError] = useState("");
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [showEnhancer, setShowEnhancer] = useState(false);
 
   const styles = [
     { id: "realistic", name: "Realistic" },
@@ -107,125 +109,166 @@ export default function GeneratePage() {
     // Optionally, you could refresh the gallery here or show a notification
   };
 
+  const handleEnhancePrompt = () => {
+    setShowEnhancer(true);
+  };
+
+  const handleCancelEnhance = () => {
+    setShowEnhancer(false);
+  };
+
+  const handleApplyEnhanced = (
+    enhancedPrompt: string,
+    enhancedNegativePrompt: string
+  ) => {
+    setPrompt(enhancedPrompt);
+    setNegativePrompt(enhancedNegativePrompt);
+    setShowEnhancer(false);
+  };
+
   return (
     <div className="min-h-screen p-8">
       <Navigation />
 
       <main className="max-w-4xl mx-auto">
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-8">
-          <h2 className="text-xl font-semibold mb-4">
-            Customization & Generation
-          </h2>
+        {showEnhancer ? (
+          <PromptEnhancer
+            initialPrompt={prompt}
+            initialNegativePrompt={negativePrompt}
+            onApplyEnhanced={handleApplyEnhanced}
+            onCancel={handleCancelEnhance}
+          />
+        ) : (
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-8">
+            <h2 className="text-xl font-semibold mb-4">
+              Customization & Generation
+            </h2>
 
-          {error && (
-            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-              {error}
-            </div>
-          )}
-
-          <div className="mb-4">
-            <label htmlFor="prompt" className="block mb-2 font-medium">
-              Prompt
-            </label>
-            <textarea
-              id="prompt"
-              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              rows={3}
-              placeholder="Describe the image you want to generate..."
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-            />
-          </div>
-
-          <div className="mb-4">
-            <label htmlFor="negative-prompt" className="block mb-2 font-medium">
-              Negative Prompt (what to avoid)
-            </label>
-            <textarea
-              id="negative-prompt"
-              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              rows={2}
-              placeholder="Elements you want to exclude from the image..."
-              value={negativePrompt}
-              onChange={(e) => setNegativePrompt(e.target.value)}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div>
-              <label
-                htmlFor="diffusion-strength"
-                className="block mb-2 font-medium"
-              >
-                Diffusion Strength: {diffusionStrength.toFixed(2)}
-              </label>
-              <input
-                id="diffusion-strength"
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value={diffusionStrength}
-                onChange={(e) =>
-                  setDiffusionStrength(parseFloat(e.target.value))
-                }
-                className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="style-intensity"
-                className="block mb-2 font-medium"
-              >
-                Style Intensity: {styleIntensity.toFixed(2)}
-              </label>
-              <input
-                id="style-intensity"
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value={styleIntensity}
-                onChange={(e) => setStyleIntensity(parseFloat(e.target.value))}
-                className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
-              />
-            </div>
-          </div>
-
-          <div className="mb-6">
-            <label htmlFor="style" className="block mb-2 font-medium">
-              Style
-            </label>
-            <select
-              id="style"
-              value={selectedStyle}
-              onChange={(e) => setSelectedStyle(e.target.value)}
-              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-            >
-              {styles.map((style) => (
-                <option key={style.id} value={style.id}>
-                  {style.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <button
-            onClick={handleGenerate}
-            disabled={isGenerating || !prompt.trim()}
-            className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded-md transition-colors"
-          >
-            {isGenerating ? (
-              <div className="flex items-center justify-center">
-                <LoadingSpinner size="small" />
-                <span className="ml-2">Generating...</span>
+            {error && (
+              <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                {error}
               </div>
-            ) : (
-              "Generate Image"
             )}
-          </button>
-        </div>
+
+            <div className="mb-4">
+              <div className="flex justify-between items-center mb-2">
+                <label htmlFor="prompt" className="font-medium">
+                  Prompt
+                </label>
+                {prompt.trim() && (
+                  <button
+                    onClick={handleEnhancePrompt}
+                    className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                  >
+                    Enhance Prompt
+                  </button>
+                )}
+              </div>
+              <textarea
+                id="prompt"
+                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                rows={3}
+                placeholder="Describe the image you want to generate..."
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+              />
+            </div>
+
+            <div className="mb-4">
+              <label
+                htmlFor="negative-prompt"
+                className="block mb-2 font-medium"
+              >
+                Negative Prompt (what to avoid)
+              </label>
+              <textarea
+                id="negative-prompt"
+                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                rows={2}
+                placeholder="Elements you want to exclude from the image..."
+                value={negativePrompt}
+                onChange={(e) => setNegativePrompt(e.target.value)}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div>
+                <label
+                  htmlFor="diffusion-strength"
+                  className="block mb-2 font-medium"
+                >
+                  Diffusion Strength: {diffusionStrength.toFixed(2)}
+                </label>
+                <input
+                  id="diffusion-strength"
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={diffusionStrength}
+                  onChange={(e) =>
+                    setDiffusionStrength(parseFloat(e.target.value))
+                  }
+                  className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="style-intensity"
+                  className="block mb-2 font-medium"
+                >
+                  Style Intensity: {styleIntensity.toFixed(2)}
+                </label>
+                <input
+                  id="style-intensity"
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={styleIntensity}
+                  onChange={(e) =>
+                    setStyleIntensity(parseFloat(e.target.value))
+                  }
+                  className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                />
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <label htmlFor="style" className="block mb-2 font-medium">
+                Style
+              </label>
+              <select
+                id="style"
+                value={selectedStyle}
+                onChange={(e) => setSelectedStyle(e.target.value)}
+                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              >
+                {styles.map((style) => (
+                  <option key={style.id} value={style.id}>
+                    {style.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <button
+              onClick={handleGenerate}
+              disabled={isGenerating || !prompt.trim()}
+              className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded-md transition-colors"
+            >
+              {isGenerating ? (
+                <div className="flex items-center justify-center">
+                  <LoadingSpinner size="small" />
+                  <span className="ml-2">Generating...</span>
+                </div>
+              ) : (
+                "Generate Image"
+              )}
+            </button>
+          </div>
+        )}
 
         {isGenerating && (
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-8 flex flex-col items-center">

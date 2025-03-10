@@ -47,6 +47,16 @@ export default function Navigation() {
           >
             Logs
           </Link>
+          <Link
+            href="/fine-tune"
+            className={`px-3 py-2 rounded-md ${
+              isActive("/fine-tune")
+                ? "bg-blue-600 text-white"
+                : "hover:bg-gray-200 dark:hover:bg-gray-700"
+            }`}
+          >
+            Fine-tune
+          </Link>
         </div>
       </div>
     </nav>
