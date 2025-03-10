@@ -141,11 +141,33 @@ export default function GeneratePage() {
     document.body.removeChild(link);
   };
 
-  const handleSave = () => {
-    setSaveSuccess(true);
-    setShowConfetti(true);
-    setTimeout(() => setShowConfetti(false), 3000);
-    // Optionally, you could refresh the gallery here or show a notification
+  const handleSave = async () => {
+    try {
+      const response = await fetch("/api/gallery/save", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          requestId,
+          imageUrl: generatedImage,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to save to gallery");
+      }
+
+      setSaveSuccess(true);
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 3000);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "An unknown error occurred"
+      );
+      console.error("Error saving to gallery:", err);
+    }
   };
 
   const handleEnhancePrompt = () => {

@@ -19,6 +19,12 @@ export default function ImageGallery() {
 
   useEffect(() => {
     fetchGalleryImages();
+
+    // Set up an interval to refresh the gallery every 10 seconds
+    const refreshInterval = setInterval(fetchGalleryImages, 10000);
+
+    // Clean up the interval when the component unmounts
+    return () => clearInterval(refreshInterval);
   }, []);
 
   const fetchGalleryImages = async () => {
