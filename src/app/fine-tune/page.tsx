@@ -53,7 +53,7 @@ export default function FineTunePage() {
         <div className="flex items-center mb-6 slide-in">
           <button
             onClick={() => router.push("/")}
-            className="mr-4 p-3 rounded-full bg-purple-600 hover:bg-purple-700 text-white transition-all transform hover:scale-110 hover:rotate-12 pulsating-btn"
+            className="mr-4 p-3 rounded-full bg-purple-600/90 hover:bg-purple-700 text-white transition-all transform hover:scale-110 hover:rotate-12 pulsating-btn"
             aria-label="Go back"
           >
             <ArrowLeftIcon className="h-6 w-6" />
@@ -63,8 +63,8 @@ export default function FineTunePage() {
           </h1>
         </div>
 
-        <div className="bg-[#0f1a36] rounded-lg shadow-[0_0_20px_rgba(255,0,255,0.5)] overflow-hidden animated-border">
-          <div className="border-b border-gray-700 bg-gradient-to-r from-purple-900 via-blue-900 to-pink-900">
+        <div className="bg-[#0f1a36]/60 rounded-lg shadow-[0_0_20px_rgba(255,0,255,0.3)] overflow-hidden animated-border">
+          <div className="border-b border-gray-700 bg-gradient-to-r from-purple-900/50 via-blue-900/50 to-pink-900/50">
             <nav className="flex -mb-px">
               <button
                 onClick={() => setActiveTab("create")}
@@ -99,7 +99,7 @@ export default function FineTunePage() {
             </nav>
           </div>
 
-          <div className="p-6 bg-gradient-to-br from-[#0f1a36] to-[#1a1a4a]">
+          <div className="p-6 bg-gradient-to-br from-[#0f1a36]/60 to-[#1a1a4a]/60">
             {activeTab === "create" ? (
               <div className="slide-in">
                 <div className="mb-6">
@@ -120,7 +120,7 @@ export default function FineTunePage() {
           </div>
         </div>
 
-        <div className="mt-8 bg-[#0f1a36] rounded-lg shadow-[0_0_15px_rgba(0,255,255,0.5)] p-6 animated-border slide-in">
+        <div className="mt-8 bg-[#0f1a36]/60 rounded-lg shadow-[0_0_15px_rgba(0,255,255,0.3)] p-6 animated-border slide-in">
           <h2 className="text-2xl font-bold mb-4 neon-text-green">
             ⭐ Fine-tuning Guide Extraordinaire! ⭐
           </h2>
@@ -130,7 +130,7 @@ export default function FineTunePage() {
               Your training data should be in JSONL format, with each line
               containing a prompt and completion pair:
             </p>
-            <pre className="bg-[#0a1328] p-4 rounded-lg overflow-x-auto border-2 border-purple-500 shadow-[0_0_10px_rgba(147,51,234,0.5)]">
+            <pre className="bg-[#0a1328]/80 p-4 rounded-lg overflow-x-auto border-2 border-purple-500 shadow-[0_0_10px_rgba(147,51,234,0.3)]">
               {`{"prompt": "What is the capital of France?", "completion": "The capital of France is Paris."}\n{"prompt": "Who wrote Romeo and Juliet?", "completion": "William Shakespeare wrote Romeo and Juliet."}`}
             </pre>
 

@@ -184,13 +184,13 @@ export default function GeneratePage() {
             onCancel={handleCancelEnhance}
           />
         ) : (
-          <div className="bg-[#081231]/80 p-6 rounded-lg shadow-2xl mb-8 backdrop-blur-sm animated-border">
+          <div className="bg-[#081231]/60 p-6 rounded-lg shadow-2xl mb-8 backdrop-blur-sm animated-border">
             <h2 className="text-2xl font-bold mb-6 neon-text">
               <WavyText text="Customization & Generation" />
             </h2>
 
             {error && (
-              <div className="mb-6 p-4 bg-slate-900/80 border-4 border-slate-600 text-white rounded-lg animate-pulse shadow-lg slide-in">
+              <div className="mb-6 p-4 bg-slate-900/60 border-4 border-slate-600 text-white rounded-lg animate-pulse shadow-lg slide-in">
                 <div className="flex items-center">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -250,7 +250,7 @@ export default function GeneratePage() {
               </div>
               <textarea
                 id="prompt"
-                className="w-full p-4 border-2 border-blue-700 rounded-lg bg-[#0a1845] text-white font-medium shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-500 transition-all duration-300 input-bouncy"
+                className="w-full p-4 border-2 border-blue-700 rounded-lg bg-[#0a1845]/70 text-white font-medium shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-500 transition-all duration-300 input-bouncy"
                 rows={3}
                 placeholder="Describe the image you want to generate..."
                 value={prompt}
@@ -267,7 +267,7 @@ export default function GeneratePage() {
               </label>
               <textarea
                 id="negative-prompt"
-                className="w-full p-4 border-2 border-blue-700 rounded-lg bg-[#0a1845] text-white font-medium shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-500 transition-all duration-300 input-bouncy"
+                className="w-full p-4 border-2 border-blue-700 rounded-lg bg-[#0a1845]/70 text-white font-medium shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-500 transition-all duration-300 input-bouncy"
                 rows={2}
                 placeholder="Elements you want to exclude from the image..."
                 value={negativePrompt}
@@ -276,7 +276,7 @@ export default function GeneratePage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-              <div className="bg-[#0a1845] p-5 rounded-lg border-2 border-blue-700 shadow-lg transform transition-all duration-300 hover:scale-105">
+              <div className="bg-[#0a1845]/60 p-5 rounded-lg border-2 border-blue-700 shadow-lg transform transition-all duration-300 hover:scale-105">
                 <label
                   htmlFor="diffusion-strength"
                   className="block mb-3 text-lg font-bold text-blue-300"
@@ -305,7 +305,7 @@ export default function GeneratePage() {
                 </div>
               </div>
 
-              <div className="bg-[#0a1845] p-5 rounded-lg border-2 border-blue-700 shadow-lg transform transition-all duration-300 hover:scale-105">
+              <div className="bg-[#0a1845]/60 p-5 rounded-lg border-2 border-blue-700 shadow-lg transform transition-all duration-300 hover:scale-105">
                 <label
                   htmlFor="style-intensity"
                   className="block mb-3 text-lg font-bold text-blue-300"
@@ -335,7 +335,7 @@ export default function GeneratePage() {
               </div>
             </div>
 
-            <div className="mb-8 bg-[#0a1845] p-5 rounded-lg border-2 border-blue-700 shadow-lg transform transition-all duration-300 hover:scale-105">
+            <div className="mb-8 bg-[#0a1845]/60 p-5 rounded-lg border-2 border-blue-700 shadow-lg transform transition-all duration-300 hover:scale-105">
               <label
                 htmlFor="style"
                 className="block mb-3 text-lg font-bold text-blue-300"
@@ -346,7 +346,7 @@ export default function GeneratePage() {
                 id="style"
                 value={selectedStyle}
                 onChange={(e) => setSelectedStyle(e.target.value)}
-                className="w-full p-4 border-2 border-blue-700 rounded-lg bg-[#081231] text-white font-medium shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-500 transition-all duration-300"
+                className="w-full p-4 border-2 border-blue-700 rounded-lg bg-[#081231]/70 text-white font-medium shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-500 transition-all duration-300"
               >
                 {styles.map((style) => (
                   <option key={style.id} value={style.id}>
@@ -400,7 +400,7 @@ export default function GeneratePage() {
         )}
 
         {isGenerating && (
-          <div className="bg-[#081231]/80 p-8 rounded-lg shadow-2xl mb-8 backdrop-blur-sm animated-border flex flex-col items-center slide-in">
+          <div className="bg-[#081231]/60 p-8 rounded-lg shadow-2xl mb-8 backdrop-blur-sm animated-border flex flex-col items-center slide-in">
             <p className="mb-6 text-xl font-bold text-center neon-text">
               Creating your image...
             </p>
@@ -416,7 +416,7 @@ export default function GeneratePage() {
 
         {!isGenerating && generatedImage && (
           <>
-            <div className="bg-[#081231]/80 p-6 rounded-lg shadow-2xl mb-8 backdrop-blur-sm animated-border slide-in">
+            <div className="bg-[#081231]/60 p-6 rounded-lg shadow-2xl mb-8 backdrop-blur-sm animated-border slide-in">
               <h2 className="text-2xl font-bold mb-6 neon-text">
                 <WavyText text="Your Generated Masterpiece" />
               </h2>
@@ -488,7 +488,7 @@ export default function GeneratePage() {
                 </div>
               </div>
 
-              <div className="bg-[#0a1845] p-5 rounded-lg border-2 border-blue-700 shadow-lg">
+              <div className="bg-[#0a1845]/60 p-5 rounded-lg border-2 border-blue-700 shadow-lg">
                 <h3 className="text-lg font-bold mb-3 text-blue-300">
                   Image Details
                 </h3>
@@ -533,7 +533,7 @@ export default function GeneratePage() {
             </div>
 
             {saveSuccess && (
-              <div className="mt-4 p-5 bg-[#0a1845] border-2 border-blue-500 text-white rounded-lg shadow-lg slide-in">
+              <div className="mt-4 p-5 bg-[#0a1845]/60 border-2 border-blue-500 text-white rounded-lg shadow-lg slide-in">
                 <div className="flex items-center">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -567,13 +567,13 @@ export default function GeneratePage() {
             )}
 
             {generationLogs.length > 0 && (
-              <div className="bg-[#081231]/80 p-6 rounded-lg shadow-2xl mt-8 backdrop-blur-sm animated-border slide-in">
+              <div className="bg-[#081231]/60 p-6 rounded-lg shadow-2xl mt-8 backdrop-blur-sm animated-border slide-in">
                 <h2 className="text-2xl font-bold mb-6 neon-text">
                   <WavyText text="Generation Logs" />
                 </h2>
                 <div className="border-2 border-blue-700 rounded-lg overflow-hidden shadow-lg">
                   <table className="min-w-full divide-y divide-blue-700">
-                    <thead className="bg-[#0a1845]">
+                    <thead className="bg-[#0a1845]/70">
                       <tr>
                         <th className="px-6 py-4 text-left text-sm font-bold text-blue-300 uppercase tracking-wider">
                           Step
@@ -583,7 +583,7 @@ export default function GeneratePage() {
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="bg-[#081231] divide-y divide-blue-700">
+                    <tbody className="bg-[#081231]/70 divide-y divide-blue-700">
                       {generationLogs.map((log, index) => (
                         <tr
                           key={index}

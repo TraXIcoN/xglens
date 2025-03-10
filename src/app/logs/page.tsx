@@ -187,13 +187,13 @@ export default function LogsPage() {
       <Navigation />
 
       <main className="max-w-6xl mx-auto px-4 py-8 relative z-10">
-        <div className="bg-[#081231]/80 p-6 rounded-lg shadow-2xl mb-8 backdrop-blur-sm animated-border">
+        <div className="bg-[#081231]/60 p-6 rounded-lg shadow-2xl mb-8 backdrop-blur-sm animated-border">
           <h1 className="text-3xl font-bold mb-6 neon-text">
             <WavyText text="Generation Logs" />
           </h1>
 
           {error && (
-            <div className="mb-6 p-4 bg-slate-900/80 border-4 border-slate-600 text-white rounded-lg animate-pulse shadow-lg slide-in">
+            <div className="mb-6 p-4 bg-slate-900/60 border-4 border-slate-600 text-white rounded-lg animate-pulse shadow-lg slide-in">
               <div className="flex items-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -215,7 +215,7 @@ export default function LogsPage() {
           )}
 
           {!tableExists && (
-            <div className="mb-6 p-6 bg-indigo-900/40 border-4 border-indigo-700 text-white rounded-lg shadow-lg slide-in">
+            <div className="mb-6 p-6 bg-indigo-900/30 border-4 border-indigo-700 text-white rounded-lg shadow-lg slide-in">
               <h3 className="font-bold text-xl mb-4 neon-text">
                 Database Table Not Found
               </h3>
@@ -228,11 +228,11 @@ export default function LogsPage() {
                 and view logs.
               </p>
 
-              <div className="bg-[#0a1845] p-5 rounded-lg border-2 border-blue-700 mb-6 shadow-lg">
+              <div className="bg-[#0a1845]/60 p-5 rounded-lg border-2 border-blue-700 mb-6 shadow-lg">
                 <h4 className="font-bold mb-3 text-lg text-blue-300">
                   SQL to Create Table:
                 </h4>
-                <pre className="text-xs bg-black p-4 rounded-lg overflow-x-auto border-2 border-blue-800 text-blue-300">
+                <pre className="text-xs bg-black/70 p-4 rounded-lg overflow-x-auto border-2 border-blue-800 text-blue-300">
                   {`-- Create the generation_logs table
 CREATE TABLE public.generation_logs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -434,7 +434,7 @@ CREATE INDEX idx_generation_logs_created_at ON public.generation_logs(created_at
               ) : (
                 <div className="overflow-x-auto rounded-lg border-2 border-blue-700 shadow-lg">
                   <table className="min-w-full divide-y divide-blue-700">
-                    <thead className="bg-[#0a1845]">
+                    <thead className="bg-[#0a1845]/70">
                       <tr>
                         <th className="px-6 py-4 text-left text-sm font-bold text-blue-300 uppercase tracking-wider">
                           Request ID
@@ -453,20 +453,20 @@ CREATE INDEX idx_generation_logs_created_at ON public.generation_logs(created_at
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="bg-[#081231] divide-y divide-blue-700">
+                    <tbody className="bg-[#081231]/70 divide-y divide-blue-700">
                       {processedLogs.map((log) => (
                         <tr
                           key={log.id}
-                          className={`hover:bg-[#0a1845] cursor-pointer transition-all duration-300 ${
+                          className={`hover:bg-[#0a1845]/80 cursor-pointer transition-all duration-300 ${
                             selectedRequestId === log.request_id
-                              ? "bg-blue-900/30 border-l-4 border-blue-500"
+                              ? "bg-blue-900/20 border-l-4 border-blue-500"
                               : ""
                           }`}
                           onClick={() => handleRequestClick(log.request_id)}
                         >
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             {log.isFirstOccurrence ? (
-                              <span className="font-mono bg-[#0a1845] px-2 py-1 rounded border border-blue-700">
+                              <span className="font-mono bg-[#0a1845]/60 px-2 py-1 rounded border border-blue-700">
                                 {log.request_id.substring(0, 8) + "..."}
                               </span>
                             ) : (
@@ -506,7 +506,7 @@ CREATE INDEX idx_generation_logs_created_at ON public.generation_logs(created_at
         </div>
 
         {tableExists && selectedRequestId && groupedLogs[selectedRequestId] && (
-          <div className="bg-[#081231]/80 p-6 rounded-lg shadow-2xl mb-8 backdrop-blur-sm animated-border slide-in">
+          <div className="bg-[#081231]/60 p-6 rounded-lg shadow-2xl mb-8 backdrop-blur-sm animated-border slide-in">
             <h2 className="text-2xl font-bold mb-6 neon-text">
               <WavyText text="Request Details" />
             </h2>
@@ -516,7 +516,7 @@ CREATE INDEX idx_generation_logs_created_at ON public.generation_logs(created_at
                 <h3 className="text-xl font-bold mb-3 text-blue-300">
                   Request Information
                 </h3>
-                <div className="bg-[#0a1845] p-5 rounded-lg border-2 border-blue-700 shadow-lg">
+                <div className="bg-[#0a1845]/60 p-5 rounded-lg border-2 border-blue-700 shadow-lg">
                   <p className="mb-2 text-lg">
                     <strong className="text-blue-300">Request ID:</strong>{" "}
                     <span className="font-mono bg-black/30 px-2 py-1 rounded">
@@ -551,7 +551,7 @@ CREATE INDEX idx_generation_logs_created_at ON public.generation_logs(created_at
                   <h3 className="text-xl font-bold mb-3 text-blue-300">
                     Generated Image
                   </h3>
-                  <div className="bg-[#0a1845] p-5 rounded-lg border-2 border-blue-700 shadow-lg flex justify-center">
+                  <div className="bg-[#0a1845]/60 p-5 rounded-lg border-2 border-blue-700 shadow-lg flex justify-center">
                     <img
                       src={
                         groupedLogs[selectedRequestId].find(
@@ -586,7 +586,7 @@ CREATE INDEX idx_generation_logs_created_at ON public.generation_logs(created_at
                       <div className="absolute left-0 top-2 w-9 h-9 rounded-full flex items-center justify-center bg-blue-600 text-white font-bold border-2 border-blue-400 shadow-lg z-10">
                         {index + 1}
                       </div>
-                      <div className="bg-[#0a1845] p-5 rounded-lg border-2 border-blue-700 shadow-lg">
+                      <div className="bg-[#0a1845]/60 p-5 rounded-lg border-2 border-blue-700 shadow-lg">
                         <div className="flex justify-between mb-3">
                           <span
                             className={`px-3 py-1 text-sm rounded-full font-bold ${getStatusColor(
@@ -605,7 +605,7 @@ CREATE INDEX idx_generation_logs_created_at ON public.generation_logs(created_at
                             <p className="text-sm font-medium text-blue-300 mb-1">
                               Details:
                             </p>
-                            <pre className="text-xs bg-black p-3 rounded-lg overflow-x-auto border border-blue-700 text-blue-200">
+                            <pre className="text-xs bg-black/70 p-3 rounded-lg overflow-x-auto border border-blue-700 text-blue-200">
                               {JSON.stringify(log.details, null, 2)}
                             </pre>
                           </div>

@@ -110,7 +110,7 @@ export default function ImageGallery() {
   return (
     <div className="py-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Your Gallery</h2>
+        <h2 className="text-2xl font-bold">Generated Images</h2>
         <Link
           href="/generate"
           className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
