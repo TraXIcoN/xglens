@@ -5,6 +5,7 @@ import GeneratedImage from "../components/GeneratedImage";
 import Navigation from "../components/Navigation";
 import LoadingSpinner from "../components/LoadingSpinner";
 import PromptEnhancer from "../components/PromptEnhancer";
+import AnimatedBackground from "../components/AnimatedBackground";
 import Link from "next/link";
 
 interface GenerationResponse {
@@ -127,10 +128,11 @@ export default function GeneratePage() {
   };
 
   return (
-    <div className="min-h-screen p-8">
+    <div className="min-h-screen">
+      <AnimatedBackground />
       <Navigation />
 
-      <main className="max-w-4xl mx-auto">
+      <main className="max-w-4xl mx-auto px-4 py-8">
         {showEnhancer ? (
           <PromptEnhancer
             initialPrompt={prompt}
@@ -139,8 +141,8 @@ export default function GeneratePage() {
             onCancel={handleCancelEnhance}
           />
         ) : (
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-8">
-            <h2 className="text-xl font-semibold mb-4">
+          <div className="bg-[#0f1a36] p-6 rounded-lg shadow-md mb-8">
+            <h2 className="text-xl font-semibold mb-4 text-white">
               Customization & Generation
             </h2>
 
@@ -152,7 +154,7 @@ export default function GeneratePage() {
 
             <div className="mb-4">
               <div className="flex justify-between items-center mb-2">
-                <label htmlFor="prompt" className="font-medium">
+                <label htmlFor="prompt" className="font-medium text-white">
                   Prompt
                 </label>
                 {prompt.trim() && (
@@ -177,7 +179,7 @@ export default function GeneratePage() {
             <div className="mb-4">
               <label
                 htmlFor="negative-prompt"
-                className="block mb-2 font-medium"
+                className="block mb-2 font-medium text-white"
               >
                 Negative Prompt (what to avoid)
               </label>
@@ -195,7 +197,7 @@ export default function GeneratePage() {
               <div>
                 <label
                   htmlFor="diffusion-strength"
-                  className="block mb-2 font-medium"
+                  className="block mb-2 font-medium text-white"
                 >
                   Diffusion Strength: {diffusionStrength.toFixed(2)}
                 </label>
@@ -216,7 +218,7 @@ export default function GeneratePage() {
               <div>
                 <label
                   htmlFor="style-intensity"
-                  className="block mb-2 font-medium"
+                  className="block mb-2 font-medium text-white"
                 >
                   Style Intensity: {styleIntensity.toFixed(2)}
                 </label>
@@ -236,7 +238,10 @@ export default function GeneratePage() {
             </div>
 
             <div className="mb-6">
-              <label htmlFor="style" className="block mb-2 font-medium">
+              <label
+                htmlFor="style"
+                className="block mb-2 font-medium text-white"
+              >
                 Style
               </label>
               <select
