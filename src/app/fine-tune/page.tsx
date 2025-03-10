@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import FineTuningForm from "../components/FineTuningForm";
 import FineTuningStatus from "../components/FineTuningStatus";
@@ -28,6 +28,22 @@ const WavyText = ({
 };
 
 export default function FineTunePage() {
+  const router = useRouter();
+
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-purple-500"></div>
+        </div>
+      }
+    >
+      <FineTunePageContent />
+    </Suspense>
+  );
+}
+
+function FineTunePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const jobId = searchParams.get("jobId");
