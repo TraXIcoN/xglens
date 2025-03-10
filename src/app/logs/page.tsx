@@ -43,7 +43,6 @@ export default function LogsPage() {
     null
   );
 
-  // Fetch logs on component mount and when pagination changes
   useEffect(() => {
     fetchLogs();
   }, [limit, offset]);
@@ -114,6 +113,30 @@ export default function LogsPage() {
         return "bg-gray-100 text-gray-800";
     }
   };
+
+  const processLogsForDisplay = () => {
+    const seenRequestIds = new Map<string, boolean>();
+
+    const sortedLogs = [...logs].sort(
+      (a, b) =>
+        new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+    );
+
+    return sortedLogs.map((log) => {
+      const isFirstOccurrence = !seenRequestIds.has(log.request_id);
+
+      if (isFirstOccurrence) {
+        seenRequestIds.set(log.request_id, true);
+      }
+
+      return {
+        ...log,
+        isFirstOccurrence,
+      };
+    });
+  };
+
+  const processedLogs = processLogsForDisplay();
 
   return (
     <div className="min-h-screen p-8">
@@ -259,7 +282,7 @@ CREATE INDEX idx_generation_logs_created_at ON public.generation_logs(created_at
                       </tr>
                     </thead>
                     <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-                      {logs.map((log) => (
+                      {processedLogs.map((log) => (
                         <tr
                           key={log.id}
                           className={`hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer ${
@@ -270,10 +293,14 @@ CREATE INDEX idx_generation_logs_created_at ON public.generation_logs(created_at
                           onClick={() => handleRequestClick(log.request_id)}
                         >
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                            {log.request_id.substring(0, 8)}...
+                            {log.isFirstOccurrence ? (
+                              log.request_id.substring(0, 8) + "..."
+                            ) : (
+                              <span className="text-gray-400">-</span>
+                            )}
                           </td>
                           <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100 max-w-xs truncate">
-                            {log.prompt}
+                            {log.isFirstOccurrence ? log.prompt : ""}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span
