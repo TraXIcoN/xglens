@@ -1,10 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import FineTuningForm from "../components/FineTuningForm";
 import FineTuningStatus from "../components/FineTuningStatus";
 import { ArrowLeftIcon } from "@heroicons/react/24/solid";
+import AnimatedBackground from "../components/AnimatedBackground";
+import Confetti from "../components/Confetti";
+
+// Function to create wavy text with individual letter animations
+const WavyText = ({
+  text,
+  className = "",
+}: {
+  text: string;
+  className?: string;
+}) => {
+  return (
+    <span className={`wavy-text ${className}`}>
+      {text.split("").map((char, index) => (
+        <span key={index} style={{ animationDelay: `${index * 0.05}s` }}>
+          {char}
+        </span>
+      ))}
+    </span>
+  );
+};
 
 export default function FineTunePage() {
   const router = useRouter();
@@ -13,133 +34,166 @@ export default function FineTunePage() {
   const [activeTab, setActiveTab] = useState<"create" | "status">(
     jobId ? "status" : "create"
   );
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [tabHover, setTabHover] = useState<"create" | "status" | null>(null);
+
+  // Trigger confetti on initial load for fun
+  useEffect(() => {
+    setShowConfetti(true);
+    const timer = setTimeout(() => setShowConfetti(false), 3000);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex items-center mb-6">
-        <button
-          onClick={() => router.push("/")}
-          className="mr-4 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-          aria-label="Go back"
-        >
-          <ArrowLeftIcon className="h-5 w-5" />
-        </button>
-        <h1 className="text-2xl font-bold">Model Fine-tuning</h1>
-      </div>
+    <div className="min-h-screen">
+      <AnimatedBackground />
+      <Confetti active={showConfetti} />
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
-        <div className="border-b border-gray-200 dark:border-gray-700">
-          <nav className="flex -mb-px">
-            <button
-              onClick={() => setActiveTab("create")}
-              className={`py-4 px-6 text-center border-b-2 font-medium text-sm ${
-                activeTab === "create"
-                  ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
-              }`}
-            >
-              Create Fine-tuning Job
-            </button>
-            {jobId && (
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center mb-6 slide-in">
+          <button
+            onClick={() => router.push("/")}
+            className="mr-4 p-3 rounded-full bg-purple-600 hover:bg-purple-700 text-white transition-all transform hover:scale-110 hover:rotate-12 pulsating-btn"
+            aria-label="Go back"
+          >
+            <ArrowLeftIcon className="h-6 w-6" />
+          </button>
+          <h1 className="text-3xl font-bold neon-text-pink">
+            <WavyText text="✨ Model Fine-tuning Extravaganza! ✨" />
+          </h1>
+        </div>
+
+        <div className="bg-[#0f1a36] rounded-lg shadow-[0_0_20px_rgba(255,0,255,0.5)] overflow-hidden animated-border">
+          <div className="border-b border-gray-700 bg-gradient-to-r from-purple-900 via-blue-900 to-pink-900">
+            <nav className="flex -mb-px">
               <button
-                onClick={() => setActiveTab("status")}
-                className={`py-4 px-6 text-center border-b-2 font-medium text-sm ${
-                  activeTab === "status"
-                    ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
+                onClick={() => setActiveTab("create")}
+                onMouseEnter={() => setTabHover("create")}
+                onMouseLeave={() => setTabHover(null)}
+                className={`py-4 px-8 text-center border-b-4 font-bold text-md transition-all duration-300 transform ${
+                  tabHover === "create" ? "scale-110" : ""
+                } ${
+                  activeTab === "create"
+                    ? "border-pink-500 text-white neon-text"
+                    : "border-transparent text-gray-400 hover:text-white"
                 }`}
               >
-                Job Status
+                🚀 Create Fine-tuning Job 🚀
               </button>
-            )}
-          </nav>
-        </div>
+              {jobId && (
+                <button
+                  onClick={() => setActiveTab("status")}
+                  onMouseEnter={() => setTabHover("status")}
+                  onMouseLeave={() => setTabHover(null)}
+                  className={`py-4 px-8 text-center border-b-4 font-bold text-md transition-all duration-300 transform ${
+                    tabHover === "status" ? "scale-110" : ""
+                  } ${
+                    activeTab === "status"
+                      ? "border-blue-500 text-white neon-text"
+                      : "border-transparent text-gray-400 hover:text-white"
+                  }`}
+                >
+                  📊 Job Status 📊
+                </button>
+              )}
+            </nav>
+          </div>
 
-        <div className="p-6">
-          {activeTab === "create" ? (
-            <div>
-              <div className="mb-6">
-                <h2 className="text-xl font-semibold mb-2">
-                  Create a Fine-tuning Job
-                </h2>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Fine-tune a model on your custom dataset to improve
-                  performance on specific tasks. Upload your training data in
-                  JSONL format and configure the fine-tuning parameters.
-                </p>
+          <div className="p-6 bg-gradient-to-br from-[#0f1a36] to-[#1a1a4a]">
+            {activeTab === "create" ? (
+              <div className="slide-in">
+                <div className="mb-6">
+                  <h2 className="text-2xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 animate-pulse">
+                    Create a Spectacular Fine-tuning Job! 🎉
+                  </h2>
+                  <p className="text-cyan-300">
+                    Fine-tune a model on your custom dataset to achieve AMAZING
+                    performance! Upload your training data and watch the MAGIC
+                    happen! ✨
+                  </p>
+                </div>
+                <FineTuningForm onJobCreated={() => setShowConfetti(true)} />
               </div>
-              <FineTuningForm />
-            </div>
-          ) : (
-            jobId && <FineTuningStatus jobId={jobId} />
-          )}
+            ) : (
+              jobId && <FineTuningStatus jobId={jobId} />
+            )}
+          </div>
         </div>
-      </div>
 
-      <div className="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-semibold mb-4">Fine-tuning Guide</h2>
-        <div className="prose dark:prose-invert max-w-none">
-          <h3>Preparing Your Dataset</h3>
-          <p>
-            Your training data should be in JSONL format, with each line
-            containing a prompt and completion pair:
-          </p>
-          <pre className="bg-gray-100 dark:bg-gray-900 p-4 rounded overflow-x-auto">
-            {`{"prompt": "What is the capital of France?", "completion": "The capital of France is Paris."}\n{"prompt": "Who wrote Romeo and Juliet?", "completion": "William Shakespeare wrote Romeo and Juliet."}`}
-          </pre>
+        <div className="mt-8 bg-[#0f1a36] rounded-lg shadow-[0_0_15px_rgba(0,255,255,0.5)] p-6 animated-border slide-in">
+          <h2 className="text-2xl font-bold mb-4 neon-text-green">
+            ⭐ Fine-tuning Guide Extraordinaire! ⭐
+          </h2>
+          <div className="prose prose-invert max-w-none">
+            <h3 className="text-yellow-300">🔥 Preparing Your Dataset 🔥</h3>
+            <p className="text-blue-300">
+              Your training data should be in JSONL format, with each line
+              containing a prompt and completion pair:
+            </p>
+            <pre className="bg-[#0a1328] p-4 rounded-lg overflow-x-auto border-2 border-purple-500 shadow-[0_0_10px_rgba(147,51,234,0.5)]">
+              {`{"prompt": "What is the capital of France?", "completion": "The capital of France is Paris."}\n{"prompt": "Who wrote Romeo and Juliet?", "completion": "William Shakespeare wrote Romeo and Juliet."}`}
+            </pre>
 
-          <h3>Best Practices</h3>
-          <ul>
-            <li>
-              Include a diverse set of examples that cover the range of tasks
-              you want the model to perform.
-            </li>
-            <li>
-              Aim for at least 50-100 examples for basic fine-tuning, but more
-              examples generally lead to better results.
-            </li>
-            <li>
-              Balance your dataset to avoid biasing the model toward certain
-              responses.
-            </li>
-            <li>
-              Consider including a validation file to monitor the model's
-              performance during training.
-            </li>
-          </ul>
+            <h3 className="text-yellow-300">💯 Best Practices 💯</h3>
+            <ul className="list-disc pl-5 text-pink-300">
+              <li className="mb-2">
+                Include a DIVERSE set of examples that cover the range of tasks
+                you want the model to perform.
+              </li>
+              <li className="mb-2">
+                Aim for at least 50-100 examples for basic fine-tuning, but MORE
+                examples generally lead to BETTER results!
+              </li>
+              <li className="mb-2">
+                Balance your dataset to avoid biasing the model toward certain
+                responses.
+              </li>
+              <li className="mb-2">
+                Consider including a validation file to monitor the model's
+                performance during training.
+              </li>
+            </ul>
 
-          <h3>Hyperparameters</h3>
-          <p>
-            The default hyperparameters work well for most use cases, but you
-            can adjust them based on your specific needs:
-          </p>
-          <ul>
-            <li>
-              <strong>Batch Size:</strong> Larger batch sizes can speed up
-              training but require more memory.
-            </li>
-            <li>
-              <strong>Learning Rate:</strong> Controls how quickly the model
-              adapts to the training data. Lower values are more stable but
-              train slower.
-            </li>
-            <li>
-              <strong>Epochs:</strong> The number of times the model will see
-              each example during training. More epochs can improve performance
-              but risk overfitting.
-            </li>
-          </ul>
+            <h3 className="text-yellow-300">⚙️ Hyperparameters ⚙️</h3>
+            <p className="text-blue-300">
+              The default hyperparameters work well for most use cases, but you
+              can SUPERCHARGE them based on your specific needs:
+            </p>
+            <ul className="list-disc pl-5 text-green-300">
+              <li className="mb-2">
+                <strong className="text-white">Batch Size:</strong> Larger batch
+                sizes can SPEED UP training but require more memory.
+              </li>
+              <li className="mb-2">
+                <strong className="text-white">Learning Rate:</strong> Controls
+                how QUICKLY the model adapts to the training data. Lower values
+                are more stable but train slower.
+              </li>
+              <li className="mb-2">
+                <strong className="text-white">Epochs:</strong> The number of
+                times the model will see each example during training. More
+                epochs can BOOST performance but risk overfitting.
+              </li>
+            </ul>
 
-          <h3>After Fine-tuning</h3>
-          <p>Once your fine-tuning job completes successfully, you can:</p>
-          <ul>
-            <li>Download the model checkpoint files for deployment.</li>
-            <li>Evaluate the model's performance on your specific tasks.</li>
-            <li>
-              Use the fine-tuned model in your applications by referencing its
-              ID.
-            </li>
-          </ul>
+            <h3 className="text-yellow-300">🏆 After Fine-tuning 🏆</h3>
+            <p className="text-blue-300">
+              Once your fine-tuning job completes successfully, you can:
+            </p>
+            <ul className="list-disc pl-5 text-purple-300">
+              <li className="mb-2">
+                Download the model checkpoint files for DEPLOYMENT! 🚀
+              </li>
+              <li className="mb-2">
+                Evaluate the model's AMAZING performance on your specific tasks!
+                📈
+              </li>
+              <li className="mb-2">
+                Use the fine-tuned model in your applications by referencing its
+                ID! 🔥
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>

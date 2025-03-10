@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import LoadingSpinner from "./LoadingSpinner";
+import Confetti from "./Confetti";
+import AnimatedBackground from "./AnimatedBackground";
 
 interface PromptEnhancerProps {
   initialPrompt: string;
@@ -12,6 +14,23 @@ interface PromptEnhancerProps {
   ) => void;
   onCancel: () => void;
 }
+
+// Wavy text animation component
+const WavyText = ({ text }: { text: string }) => {
+  return (
+    <span className="inline-block">
+      {text.split("").map((char, i) => (
+        <span
+          key={i}
+          className="inline-block animate-wave"
+          style={{ animationDelay: `${i * 0.1}s` }}
+        >
+          {char}
+        </span>
+      ))}
+    </span>
+  );
+};
 
 export default function PromptEnhancer({
   initialPrompt,
@@ -25,6 +44,12 @@ export default function PromptEnhancer({
   const [enhancedNegativePrompt, setEnhancedNegativePrompt] = useState("");
   const [explanation, setExplanation] = useState("");
   const [showEnhanced, setShowEnhanced] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [hoverStates, setHoverStates] = useState({
+    cancel: false,
+    enhance: false,
+    apply: false,
+  });
 
   const enhancePrompt = async () => {
     setIsEnhancing(true);
@@ -52,6 +77,8 @@ export default function PromptEnhancer({
       setEnhancedNegativePrompt(data.negativePrompt);
       setExplanation(data.explanation);
       setShowEnhanced(true);
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 5000);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "An unknown error occurred"
@@ -64,27 +91,39 @@ export default function PromptEnhancer({
 
   const handleApply = () => {
     onApplyEnhanced(enhancedPrompt, enhancedNegativePrompt);
+    setShowConfetti(true);
+    setTimeout(() => setShowConfetti(false), 5000);
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-      <h2 className="text-xl font-semibold mb-4">Prompt Enhancement</h2>
+    <div className="relative min-h-[500px] w-full overflow-hidden rounded-xl bg-[#0f1a36] p-8 shadow-[0_0_15px_rgba(0,0,0,0.3)] transition-all duration-300">
+      <AnimatedBackground />
+      <Confetti active={showConfetti} />
+
+      <h2 className="mb-6 text-center text-3xl font-bold text-white">
+        <WavyText text="Prompt Enhancement" />
+      </h2>
 
       {error && (
-        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+        <div className="mb-4 animate-slide-in rounded border border-red-400 bg-red-100/10 p-3 text-red-400">
           {error}
         </div>
       )}
 
-      <div className="mb-4">
-        <h3 className="font-medium mb-2">Original Prompt</h3>
-        <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-md">
-          {initialPrompt}
+      <div className="mb-6 space-y-4">
+        <div className="transform transition-all duration-300 hover:scale-[1.02]">
+          <h3 className="mb-2 font-medium text-white">Original Prompt</h3>
+          <div className="rounded-md border border-white/20 bg-black/30 p-4 text-white backdrop-blur-sm">
+            {initialPrompt}
+          </div>
         </div>
+
         {initialNegativePrompt && (
-          <div className="mt-2">
-            <h3 className="font-medium mb-2">Original Negative Prompt</h3>
-            <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-md">
+          <div className="mt-4 transform transition-all duration-300 hover:scale-[1.02]">
+            <h3 className="mb-2 font-medium text-white">
+              Original Negative Prompt
+            </h3>
+            <div className="rounded-md border border-white/20 bg-black/30 p-4 text-white backdrop-blur-sm">
               {initialNegativePrompt}
             </div>
           </div>
@@ -95,14 +134,30 @@ export default function PromptEnhancer({
         <div className="flex justify-between">
           <button
             onClick={onCancel}
-            className="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-md transition-colors"
+            onMouseEnter={() =>
+              setHoverStates((prev) => ({ ...prev, cancel: true }))
+            }
+            onMouseLeave={() =>
+              setHoverStates((prev) => ({ ...prev, cancel: false }))
+            }
+            className={`transform rounded-md bg-white/10 px-6 py-3 text-white transition-all duration-300 hover:scale-105 hover:bg-white/20 hover:shadow-[0_0_15px_rgba(255,255,255,0.2)] ${
+              hoverStates.cancel ? "animate-pulse" : ""
+            }`}
           >
             Cancel
           </button>
           <button
             onClick={enhancePrompt}
             disabled={isEnhancing}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-md transition-colors"
+            onMouseEnter={() =>
+              setHoverStates((prev) => ({ ...prev, enhance: true }))
+            }
+            onMouseLeave={() =>
+              setHoverStates((prev) => ({ ...prev, enhance: false }))
+            }
+            className={`transform rounded-md bg-blue-600 px-6 py-3 text-white transition-all duration-300 hover:scale-105 hover:bg-blue-700 hover:shadow-[0_0_15px_rgba(59,130,246,0.5)] disabled:bg-blue-400 ${
+              hoverStates.enhance ? "animate-pulse" : ""
+            }`}
           >
             {isEnhancing ? (
               <div className="flex items-center">
@@ -116,33 +171,57 @@ export default function PromptEnhancer({
         </div>
       ) : (
         <>
-          <div className="mb-4">
-            <h3 className="font-medium mb-2">Enhanced Prompt</h3>
-            <div className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md">
-              {enhancedPrompt}
+          <div className="mb-6 space-y-6">
+            <div className="transform transition-all duration-300 hover:scale-[1.02]">
+              <h3 className="mb-2 font-medium text-white">Enhanced Prompt</h3>
+              <div className="rounded-md border border-blue-400/30 bg-blue-500/10 p-4 text-white backdrop-blur-sm">
+                {enhancedPrompt}
+              </div>
             </div>
 
-            <h3 className="font-medium mb-2 mt-4">Enhanced Negative Prompt</h3>
-            <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
-              {enhancedNegativePrompt}
+            <div className="transform transition-all duration-300 hover:scale-[1.02]">
+              <h3 className="mb-2 font-medium text-white">
+                Enhanced Negative Prompt
+              </h3>
+              <div className="rounded-md border border-red-400/30 bg-red-500/10 p-4 text-white backdrop-blur-sm">
+                {enhancedNegativePrompt}
+              </div>
             </div>
 
-            <h3 className="font-medium mb-2 mt-4">Explanation</h3>
-            <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
-              {explanation}
+            <div className="transform transition-all duration-300 hover:scale-[1.02]">
+              <h3 className="mb-2 font-medium text-white">Explanation</h3>
+              <div className="rounded-md border border-white/30 bg-white/5 p-4 text-white backdrop-blur-sm">
+                {explanation}
+              </div>
             </div>
           </div>
 
           <div className="flex justify-between">
             <button
               onClick={onCancel}
-              className="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-md transition-colors"
+              onMouseEnter={() =>
+                setHoverStates((prev) => ({ ...prev, cancel: true }))
+              }
+              onMouseLeave={() =>
+                setHoverStates((prev) => ({ ...prev, cancel: false }))
+              }
+              className={`transform rounded-md bg-white/10 px-6 py-3 text-white transition-all duration-300 hover:scale-105 hover:bg-white/20 hover:shadow-[0_0_15px_rgba(255,255,255,0.2)] ${
+                hoverStates.cancel ? "animate-pulse" : ""
+              }`}
             >
               Cancel
             </button>
             <button
               onClick={handleApply}
-              className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors"
+              onMouseEnter={() =>
+                setHoverStates((prev) => ({ ...prev, apply: true }))
+              }
+              onMouseLeave={() =>
+                setHoverStates((prev) => ({ ...prev, apply: false }))
+              }
+              className={`transform rounded-md bg-blue-600 px-6 py-3 text-white transition-all duration-300 hover:scale-105 hover:bg-blue-700 hover:shadow-[0_0_15px_rgba(59,130,246,0.5)] ${
+                hoverStates.apply ? "animate-pulse" : ""
+              }`}
             >
               Apply Enhanced Prompt
             </button>

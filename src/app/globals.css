@@ -6,6 +6,14 @@
   --bg-primary: #050b1f;
   --bg-secondary: #081231;
   --bg-tertiary: #0a1845;
+
+  /* Neon colors */
+  --neon-pink: #ff00ff;
+  --neon-blue: #00ffff;
+  --neon-green: #00ff00;
+  --neon-yellow: #ffff00;
+  --neon-purple: #9d00ff;
+  --neon-orange: #ff6600;
 }
 
 @theme inline {
@@ -124,6 +132,172 @@ body {
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+/* SUPER TACKY OVER-THE-TOP STYLES */
+
+/* Neon text effect */
+.neon-text {
+  text-shadow: 0 0 5px var(--neon-blue), 0 0 10px var(--neon-blue),
+    0 0 20px var(--neon-blue), 0 0 40px var(--neon-blue);
+  animation: neon-pulse 1.5s infinite alternate;
+}
+
+.neon-text-pink {
+  text-shadow: 0 0 5px var(--neon-pink), 0 0 10px var(--neon-pink),
+    0 0 20px var(--neon-pink), 0 0 40px var(--neon-pink);
+  animation: neon-pulse 1.5s infinite alternate;
+}
+
+.neon-text-green {
+  text-shadow: 0 0 5px var(--neon-green), 0 0 10px var(--neon-green),
+    0 0 20px var(--neon-green), 0 0 40px var(--neon-green);
+  animation: neon-pulse 1.5s infinite alternate;
+}
+
+/* Animated borders */
+.animated-border {
+  position: relative;
+  border-radius: 0.5rem;
+}
+
+.animated-border::before {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  z-index: -1;
+  border-radius: 0.75rem;
+  background: linear-gradient(
+    90deg,
+    var(--neon-pink),
+    var(--neon-blue),
+    var(--neon-green),
+    var(--neon-yellow),
+    var(--neon-purple),
+    var(--neon-orange),
+    var(--neon-pink)
+  );
+  background-size: 400% 400%;
+  animation: border-shift 3s linear infinite;
+}
+
+/* Bouncy inputs */
+.bouncy-input {
+  transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+.bouncy-input:focus {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.7);
+}
+
+/* Pulsating buttons */
+.pulsating-btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+  animation: pulse 1.5s infinite;
+}
+
+.pulsating-btn:hover {
+  transform: scale(1.1);
+  animation: none;
+  background: linear-gradient(
+    45deg,
+    var(--neon-pink),
+    var(--neon-purple),
+    var(--neon-blue)
+  );
+  background-size: 200% 200%;
+  animation: gradient-shift 2s ease infinite;
+}
+
+.pulsating-btn::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(255, 255, 255, 0) 70%
+  );
+  opacity: 0;
+  transform: scale(0);
+  transition: transform 0.5s, opacity 0.5s;
+}
+
+.pulsating-btn:active::after {
+  opacity: 0.3;
+  transform: scale(1);
+  transition: 0s;
+}
+
+/* Wavy text */
+.wavy-text {
+  position: relative;
+  animation: wave-text 2s ease-in-out infinite;
+}
+
+.wavy-text span {
+  display: inline-block;
+  animation: wave-letter 2s ease-in-out infinite;
+}
+
+.wavy-text span:nth-child(2n) {
+  animation-delay: 0.1s;
+}
+
+.wavy-text span:nth-child(3n) {
+  animation-delay: 0.2s;
+}
+
+.wavy-text span:nth-child(4n) {
+  animation-delay: 0.3s;
+}
+
+/* Spinning loader */
+.spinning-loader {
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: var(--neon-blue);
+  border-right-color: var(--neon-pink);
+  border-bottom-color: var(--neon-green);
+  border-left-color: var(--neon-yellow);
+  animation: spinner 1s linear infinite;
+}
+
+/* Slide-in effect */
+.slide-in {
+  animation: slide-in 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+/* Confetti container */
+.confetti-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.confetti {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background-color: var(--neon-pink);
+  opacity: 0.8;
+  animation: confetti-fall 5s linear forwards;
+}
+
 /* Animations */
 @keyframes drift {
   0% {
@@ -178,4 +352,95 @@ body {
 
 .animate-fadeIn {
   animation: fadeIn 0.8s ease-out forwards;
+}
+
+@keyframes neon-pulse {
+  0% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes border-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 255, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba(0, 255, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 255, 0);
+  }
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes wave-text {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes wave-letter {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes slide-in {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+  }
 }

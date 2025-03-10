@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import GeneratedImage from "../components/GeneratedImage";
 import Navigation from "../components/Navigation";
 import LoadingSpinner from "../components/LoadingSpinner";
 import PromptEnhancer from "../components/PromptEnhancer";
 import AnimatedBackground from "../components/AnimatedBackground";
 import Link from "next/link";
+import Confetti from "../components/Confetti";
 
 interface GenerationResponse {
   success: boolean;
@@ -25,6 +26,25 @@ interface GenerationResponse {
   }>;
 }
 
+// Wavy text component for animated headings
+const WavyText = ({
+  text,
+  className = "",
+}: {
+  text: string;
+  className?: string;
+}) => {
+  return (
+    <span className={`wavy-text ${className}`}>
+      {text.split("").map((char, index) => (
+        <span key={index} style={{ animationDelay: `${index * 0.05}s` }}>
+          {char}
+        </span>
+      ))}
+    </span>
+  );
+};
+
 export default function GeneratePage() {
   const [prompt, setPrompt] = useState("");
   const [negativePrompt, setNegativePrompt] = useState("");
@@ -40,6 +60,14 @@ export default function GeneratePage() {
   const [error, setError] = useState("");
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [showEnhancer, setShowEnhancer] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [hoverStates, setHoverStates] = useState({
+    generateButton: false,
+    enhanceButton: false,
+    downloadButton: false,
+    saveButton: false,
+  });
+  const [pulseEffect, setPulseEffect] = useState(false);
 
   const styles = [
     { id: "realistic", name: "Realistic" },
@@ -48,6 +76,14 @@ export default function GeneratePage() {
     { id: "sketch", name: "Sketch" },
     { id: "watercolor", name: "Watercolor" },
   ];
+
+  // Pulse effect for the generate button
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPulseEffect((prev) => !prev);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleGenerate = async () => {
     if (!prompt.trim()) return;
@@ -107,6 +143,8 @@ export default function GeneratePage() {
 
   const handleSave = () => {
     setSaveSuccess(true);
+    setShowConfetti(true);
+    setTimeout(() => setShowConfetti(false), 3000);
     // Optionally, you could refresh the gallery here or show a notification
   };
 
@@ -127,12 +165,17 @@ export default function GeneratePage() {
     setShowEnhancer(false);
   };
 
+  const setHover = (field: keyof typeof hoverStates, value: boolean) => {
+    setHoverStates((prev) => ({ ...prev, [field]: value }));
+  };
+
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[#050b1f] text-white">
       <AnimatedBackground />
+      <Confetti active={showConfetti} />
       <Navigation />
 
-      <main className="max-w-4xl mx-auto px-4 py-8">
+      <main className="max-w-4xl mx-auto px-4 py-8 relative z-10">
         {showEnhancer ? (
           <PromptEnhancer
             initialPrompt={prompt}
@@ -141,34 +184,73 @@ export default function GeneratePage() {
             onCancel={handleCancelEnhance}
           />
         ) : (
-          <div className="bg-[#0f1a36] p-6 rounded-lg shadow-md mb-8">
-            <h2 className="text-xl font-semibold mb-4 text-white">
-              Customization & Generation
+          <div className="bg-[#081231]/80 p-6 rounded-lg shadow-2xl mb-8 backdrop-blur-sm animated-border">
+            <h2 className="text-2xl font-bold mb-6 neon-text">
+              <WavyText text="Customization & Generation" />
             </h2>
 
             {error && (
-              <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-                {error}
+              <div className="mb-6 p-4 bg-slate-900/80 border-4 border-slate-600 text-white rounded-lg animate-pulse shadow-lg slide-in">
+                <div className="flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6 mr-3 text-slate-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                    />
+                  </svg>
+                  <span className="font-bold text-lg">{error}</span>
+                </div>
               </div>
             )}
 
-            <div className="mb-4">
-              <div className="flex justify-between items-center mb-2">
-                <label htmlFor="prompt" className="font-medium text-white">
-                  Prompt
+            <div className="mb-6 transform transition-all duration-300 hover:scale-102">
+              <div className="flex justify-between items-center mb-3">
+                <label
+                  htmlFor="prompt"
+                  className="text-lg font-bold text-blue-300"
+                >
+                  Prompt <span className="animate-pulse">✨</span>
                 </label>
                 {prompt.trim() && (
                   <button
                     onClick={handleEnhancePrompt}
-                    className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                    className={`px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold transition-all duration-300 transform ${
+                      hoverStates.enhanceButton ? "scale-110" : ""
+                    }`}
+                    onMouseEnter={() => setHover("enhanceButton", true)}
+                    onMouseLeave={() => setHover("enhanceButton", false)}
                   >
-                    Enhance Prompt
+                    <span className="flex items-center">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4 mr-1"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M13 10V3L4 14h7v7l9-11h-7z"
+                        />
+                      </svg>
+                      Enhance Prompt
+                    </span>
                   </button>
                 )}
               </div>
               <textarea
                 id="prompt"
-                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                className="w-full p-4 border-2 border-blue-700 rounded-lg bg-[#0a1845] text-white font-medium shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-500 transition-all duration-300 input-bouncy"
                 rows={3}
                 placeholder="Describe the image you want to generate..."
                 value={prompt}
@@ -176,16 +258,16 @@ export default function GeneratePage() {
               />
             </div>
 
-            <div className="mb-4">
+            <div className="mb-6 transform transition-all duration-300 hover:scale-102">
               <label
                 htmlFor="negative-prompt"
-                className="block mb-2 font-medium text-white"
+                className="block mb-3 text-lg font-bold text-blue-300"
               >
-                Negative Prompt (what to avoid)
+                Negative Prompt <span className="text-sm">(what to avoid)</span>
               </label>
               <textarea
                 id="negative-prompt"
-                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                className="w-full p-4 border-2 border-blue-700 rounded-lg bg-[#0a1845] text-white font-medium shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-500 transition-all duration-300 input-bouncy"
                 rows={2}
                 placeholder="Elements you want to exclude from the image..."
                 value={negativePrompt}
@@ -193,13 +275,16 @@ export default function GeneratePage() {
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <div className="bg-[#0a1845] p-5 rounded-lg border-2 border-blue-700 shadow-lg transform transition-all duration-300 hover:scale-105">
                 <label
                   htmlFor="diffusion-strength"
-                  className="block mb-2 font-medium text-white"
+                  className="block mb-3 text-lg font-bold text-blue-300"
                 >
-                  Diffusion Strength: {diffusionStrength.toFixed(2)}
+                  Diffusion Strength:{" "}
+                  <span className="text-white">
+                    {diffusionStrength.toFixed(2)}
+                  </span>
                 </label>
                 <input
                   id="diffusion-strength"
@@ -211,16 +296,24 @@ export default function GeneratePage() {
                   onChange={(e) =>
                     setDiffusionStrength(parseFloat(e.target.value))
                   }
-                  className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                  className="w-full h-3 bg-blue-900 rounded-lg appearance-none cursor-pointer"
                 />
+                <div className="w-full flex justify-between mt-2 text-sm text-blue-300">
+                  <span>0.00</span>
+                  <span>0.50</span>
+                  <span>1.00</span>
+                </div>
               </div>
 
-              <div>
+              <div className="bg-[#0a1845] p-5 rounded-lg border-2 border-blue-700 shadow-lg transform transition-all duration-300 hover:scale-105">
                 <label
                   htmlFor="style-intensity"
-                  className="block mb-2 font-medium text-white"
+                  className="block mb-3 text-lg font-bold text-blue-300"
                 >
-                  Style Intensity: {styleIntensity.toFixed(2)}
+                  Style Intensity:{" "}
+                  <span className="text-white">
+                    {styleIntensity.toFixed(2)}
+                  </span>
                 </label>
                 <input
                   id="style-intensity"
@@ -232,15 +325,20 @@ export default function GeneratePage() {
                   onChange={(e) =>
                     setStyleIntensity(parseFloat(e.target.value))
                   }
-                  className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                  className="w-full h-3 bg-blue-900 rounded-lg appearance-none cursor-pointer"
                 />
+                <div className="w-full flex justify-between mt-2 text-sm text-blue-300">
+                  <span>0.00</span>
+                  <span>0.50</span>
+                  <span>1.00</span>
+                </div>
               </div>
             </div>
 
-            <div className="mb-6">
+            <div className="mb-8 bg-[#0a1845] p-5 rounded-lg border-2 border-blue-700 shadow-lg transform transition-all duration-300 hover:scale-105">
               <label
                 htmlFor="style"
-                className="block mb-2 font-medium text-white"
+                className="block mb-3 text-lg font-bold text-blue-300"
               >
                 Style
               </label>
@@ -248,7 +346,7 @@ export default function GeneratePage() {
                 id="style"
                 value={selectedStyle}
                 onChange={(e) => setSelectedStyle(e.target.value)}
-                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                className="w-full p-4 border-2 border-blue-700 rounded-lg bg-[#081231] text-white font-medium shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-500 transition-all duration-300"
               >
                 {styles.map((style) => (
                   <option key={style.id} value={style.id}>
@@ -261,71 +359,240 @@ export default function GeneratePage() {
             <button
               onClick={handleGenerate}
               disabled={isGenerating || !prompt.trim()}
-              className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded-md transition-colors"
+              className={`w-full py-4 px-6 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold text-lg rounded-lg shadow-lg transition-all duration-300 transform ${
+                hoverStates.generateButton && !isGenerating && prompt.trim()
+                  ? "scale-105"
+                  : ""
+              } ${
+                pulseEffect && !isGenerating && prompt.trim()
+                  ? "pulsating-btn"
+                  : ""
+              }`}
+              onMouseEnter={() => setHover("generateButton", true)}
+              onMouseLeave={() => setHover("generateButton", false)}
             >
               {isGenerating ? (
                 <div className="flex items-center justify-center">
-                  <LoadingSpinner size="small" />
-                  <span className="ml-2">Generating...</span>
+                  <div className="spinner mr-3"></div>
+                  <span>Generating Your Masterpiece...</span>
                 </div>
               ) : (
-                "Generate Image"
+                <span className="flex items-center justify-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6 mr-2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                  Generate Image
+                </span>
               )}
             </button>
           </div>
         )}
 
         {isGenerating && (
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-8 flex flex-col items-center">
-            <p className="mb-4 text-center">Creating your image...</p>
-            <LoadingSpinner size="large" />
+          <div className="bg-[#081231]/80 p-8 rounded-lg shadow-2xl mb-8 backdrop-blur-sm animated-border flex flex-col items-center slide-in">
+            <p className="mb-6 text-xl font-bold text-center neon-text">
+              Creating your image...
+            </p>
+            <div className="spinner"></div>
+            <div className="mt-6 text-blue-300 text-center">
+              <p className="mb-2">
+                This may take a moment while we craft your masterpiece
+              </p>
+              <p>Our AI is hard at work bringing your vision to life</p>
+            </div>
           </div>
         )}
 
         {!isGenerating && generatedImage && (
           <>
-            <GeneratedImage
-              imageUrl={generatedImage}
-              requestId={requestId}
-              onDownload={handleDownload}
-              onSave={handleSave}
-            />
+            <div className="bg-[#081231]/80 p-6 rounded-lg shadow-2xl mb-8 backdrop-blur-sm animated-border slide-in">
+              <h2 className="text-2xl font-bold mb-6 neon-text">
+                <WavyText text="Your Generated Masterpiece" />
+              </h2>
+
+              <div className="flex flex-col items-center mb-6">
+                <div className="relative w-full max-w-2xl mx-auto mb-6 transform transition-all duration-500 hover:scale-102">
+                  <div className="absolute inset-0 border-4 border-blue-500 rounded-lg animate-pulse"></div>
+                  <img
+                    src={generatedImage}
+                    alt="Generated image"
+                    className="w-full rounded-lg border-2 border-blue-700 shadow-2xl"
+                  />
+                </div>
+
+                <div className="flex space-x-4 mt-4">
+                  <button
+                    onClick={handleDownload}
+                    className={`px-6 py-3 bg-[#0a1845] border-2 border-blue-700 text-white rounded-lg font-bold shadow-lg transition-all duration-300 transform ${
+                      hoverStates.downloadButton ? "scale-110" : ""
+                    }`}
+                    onMouseEnter={() => setHover("downloadButton", true)}
+                    onMouseLeave={() => setHover("downloadButton", false)}
+                  >
+                    <span className="flex items-center">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 mr-2"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                        />
+                      </svg>
+                      Download Image
+                    </span>
+                  </button>
+
+                  <button
+                    onClick={handleSave}
+                    className={`px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold shadow-lg transition-all duration-300 transform ${
+                      hoverStates.saveButton ? "scale-110" : ""
+                    } pulsating-btn`}
+                    onMouseEnter={() => setHover("saveButton", true)}
+                    onMouseLeave={() => setHover("saveButton", false)}
+                  >
+                    <span className="flex items-center">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 mr-2"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+                        />
+                      </svg>
+                      Save to Gallery
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="bg-[#0a1845] p-5 rounded-lg border-2 border-blue-700 shadow-lg">
+                <h3 className="text-lg font-bold mb-3 text-blue-300">
+                  Image Details
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p className="mb-2">
+                      <span className="font-bold text-blue-300">Prompt:</span>{" "}
+                      {prompt}
+                    </p>
+                    {negativePrompt && (
+                      <p className="mb-2">
+                        <span className="font-bold text-blue-300">
+                          Negative Prompt:
+                        </span>{" "}
+                        {negativePrompt}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <p className="mb-2">
+                      <span className="font-bold text-blue-300">Style:</span>{" "}
+                      {styles.find((s) => s.id === selectedStyle)?.name}
+                    </p>
+                    <p className="mb-2">
+                      <span className="font-bold text-blue-300">
+                        Diffusion Strength:
+                      </span>{" "}
+                      {diffusionStrength.toFixed(2)}
+                    </p>
+                    <p>
+                      <span className="font-bold text-blue-300">
+                        Style Intensity:
+                      </span>{" "}
+                      {styleIntensity.toFixed(2)}
+                    </p>
+                  </div>
+                </div>
+                <p className="mt-3 text-xs font-mono text-blue-300">
+                  Request ID: {requestId}
+                </p>
+              </div>
+            </div>
 
             {saveSuccess && (
-              <div className="mt-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
-                <p className="font-bold">Image saved to gallery!</p>
-                <p>
-                  You can view it on the{" "}
-                  <Link href="/" className="underline">
-                    home page
-                  </Link>
-                  .
-                </p>
+              <div className="mt-4 p-5 bg-[#0a1845] border-2 border-blue-500 text-white rounded-lg shadow-lg slide-in">
+                <div className="flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6 mr-3 text-blue-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                  <div>
+                    <p className="font-bold text-lg">Image saved to gallery!</p>
+                    <p>
+                      You can view it on the{" "}
+                      <Link
+                        href="/"
+                        className="text-blue-400 hover:text-blue-300 underline"
+                      >
+                        home page
+                      </Link>
+                      .
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
 
             {generationLogs.length > 0 && (
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mt-8">
-                <h2 className="text-xl font-semibold mb-4">Generation Logs</h2>
-                <div className="border border-gray-200 dark:border-gray-700 rounded-md overflow-hidden">
-                  <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead className="bg-gray-50 dark:bg-gray-800">
+              <div className="bg-[#081231]/80 p-6 rounded-lg shadow-2xl mt-8 backdrop-blur-sm animated-border slide-in">
+                <h2 className="text-2xl font-bold mb-6 neon-text">
+                  <WavyText text="Generation Logs" />
+                </h2>
+                <div className="border-2 border-blue-700 rounded-lg overflow-hidden shadow-lg">
+                  <table className="min-w-full divide-y divide-blue-700">
+                    <thead className="bg-[#0a1845]">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        <th className="px-6 py-4 text-left text-sm font-bold text-blue-300 uppercase tracking-wider">
                           Step
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        <th className="px-6 py-4 text-left text-sm font-bold text-blue-300 uppercase tracking-wider">
                           Timestamp
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                    <tbody className="bg-[#081231] divide-y divide-blue-700">
                       {generationLogs.map((log, index) => (
-                        <tr key={index}>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                        <tr
+                          key={index}
+                          className="hover:bg-[#0a1845] transition-all duration-300"
+                        >
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             {log.step}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-300 font-mono">
                             {new Date(log.timestamp).toLocaleString()}
                           </td>
                         </tr>
@@ -333,7 +600,7 @@ export default function GeneratePage() {
                     </tbody>
                   </table>
                 </div>
-                <div className="mt-4 text-sm text-gray-500 dark:text-gray-400">
+                <div className="mt-4 text-sm text-blue-300 font-mono">
                   <p>Request ID: {requestId}</p>
                 </div>
               </div>
